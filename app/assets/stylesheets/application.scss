@@ -37,3 +37,48 @@ $govuk-assets-path: "/govuk/assets/";
 .app-\!-no-wrap {
   white-space: nowrap !important;
 }
+
+.chat-output {
+  padding: govuk-spacing(4);
+  margin-bottom: govuk-spacing(8);
+  border-radius: govuk-spacing(1);
+  border: 1px solid $govuk-border-colour;
+}
+
+.message {
+  padding: govuk-spacing(4);
+  margin-bottom: govuk-spacing(2);
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+
+  &--user {
+    &::before {
+      content: 'You';
+      font-size: 16px;
+      color: #10403c;
+      background: #bfe3e0;
+      text-transform: uppercase;
+      font-weight: bold;
+      padding: govuk-spacing(1) govuk-spacing(2);
+      margin-bottom: govuk-spacing(2);
+      display: inline-block;
+    }
+  }
+
+  &--assistant {
+    &::before {
+      content: 'Bot';
+      font-size: 16px;
+      color: #144e81;
+      background: #d2e2f1;
+      text-transform: uppercase;
+      font-weight: bold;
+      padding: govuk-spacing(1) govuk-spacing(2);
+      margin-bottom: govuk-spacing(2);
+      display: inline-block;
+    }
+    background-color: govuk-colour("light-grey");
+  }
+}

@@ -1,0 +1,89 @@
+{% extends "layouts/default.html" %}
+{% set title = "Chat" %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+      <h2 class="govuk-heading-xl">{{ title }}</h2>
+      <div id="chat-output" class="chat-output govuk-body">
+        <p class="govuk-!-margin-bottom-0">Hi, I’m a chatbot. Ask me a question.</p>
+      </div>
+
+      <form method="post">
+        {{ govukTextarea({
+          "id": "chat",
+          "name": "chat",
+          "label": {
+            "text": "Your message",
+            "classes": "govuk-label--m"
+          },
+          "rows": 4
+        }) }}
+
+        {{ govukButton({
+          "text": "Send"
+        }) }}
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // method to send a message to the server
+    const sendMessage = async () => {
+      const message = document.getElementById('chat').value
+      const response = await fetch('/chat-endpoint', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message })
+      })
+
+      const json = await response.json()
+      document.getElementById('chat-output').innerHTML += `<div class="message message--user">${json.requestHtml}</div>`
+      document.getElementById('chat-output').innerHTML += `<div class="message message--assistant">${json.messageHtml}</div>`
+    }
+
+    // when I hit enter, submit the form
+    document.getElementById('chat').addEventListener('keyup', (event) => {
+      if (event.keyCode === 13) {
+        event.preventDefault()
+        sendMessage()
+        document.getElementById('chat').value = ''
+      }
+    })
+
+    // when I submit the form, send the message
+    document.querySelector('form').addEventListener('submit', (event) => {
+      event.preventDefault()
+      sendMessage()
+    })
+
+    // method to use the fetch api to stream responses from a server at the /chat-endpoint url
+    const streamChat = async () => {
+      const response = await fetch('/chat-endpoint', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: document.getElementById('chat').value
+        })
+      })
+
+      const reader = response.body.getReader()
+
+      while (true) {
+        const { done, value } = await reader.read()
+
+        if (done) {
+          break
+        }
+
+        const message = new TextDecoder('utf-8').decode(value)
+        document.getElementById('chat').innerHTML += `<p>${message}</p>`
+      }
+    }
+  </script>
+
+{% endblock %}
