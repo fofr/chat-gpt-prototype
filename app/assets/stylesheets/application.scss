@@ -21,6 +21,7 @@ $govuk-font-family: "Inter", "HelveticaNeue", "Helvetica Neue", "Arial", "Helvet
 // Add extra styles here, or re-organise the Sass files in whichever way makes most sense to you
 @import "govuk-page-masthead";
 @import "components/button";
+@import "components/table";
 @import "components/hidden-link";
 
 // Additional style helpers
@@ -57,13 +58,34 @@ $govuk-font-family: "Inter", "HelveticaNeue", "Helvetica Neue", "Arial", "Helvet
   border: 2px solid $govuk-border-colour;
 }
 
+
+code, pre {
+  font-family: Söhne Mono, Monaco, Andale Mono, Ubuntu Mono, monospace !important
+}
+
 .message {
   padding: govuk-spacing(4);
   margin-bottom: govuk-spacing(2);
 
+  p, ul, ol {
+    max-width: 31em;
+  }
+
+  pre {
+    overflow: scroll;
+    padding: govuk-spacing(2);
+    background: govuk-colour("black");
+    color: govuk-colour("white");
+    @include govuk-font($size: 16);
+  }
+
   > :last-child,
   &:last-child {
     margin-bottom: 0;
+  }
+
+  img {
+    max-width: 100%;
   }
 
   &--user {
