@@ -25,6 +25,11 @@
           <p>Responds in a GOV.UK style, formatted with markdown.</p>
           <a href="/chat/govuk/new">New GOV.UK chat</a>
         </li>
+        <li>
+          <h3 class="govuk-heading-m govuk-!-margin-top-6 govuk-!-margin-bottom-1">Conversation</h3>
+          <p>A chat between two bots.</p>
+          <a href="/chat/conversation/new">New conversation</a>
+        </li>
       </ul>
 
       <h2 class="govuk-heading-l">
@@ -35,15 +40,15 @@
         {% for key, chat in data.chats %}
           <li>
             {% if chat.messages.length > 0 %}
+              {% set firstMessage = chat.messages[0] %}
               <span class="govuk-caption-m">
                 {{ chat.type }}
               </span>
               <a href="/chat/{{ chat.type }}/{{ key }}">
-
                 {{ chat.createdAt | govukDate }} {{ chat.createdAt | govukTime }}
               </a>
               <p>
-                {{ chat.messages[0].request | truncate(100) }}
+                {{ (firstMessage.request if firstMessage.request else firstMessage.message) | truncate(100) }}
               </p>
             {% endif %}
           </li>

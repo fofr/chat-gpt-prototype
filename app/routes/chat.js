@@ -22,20 +22,42 @@ const addResponseToMessage = (message, response) => {
 }
 
 const getChatMessage = (req, response) => {
-  return {
-    request: req.body.message,
-    requestHtml: toHtml(req.body.message),
-    ...(response ? addResponseToMessage({}, response) : {})
+  if (req.params.type !== 'conversation') {
+    return {
+      request: req.body.message,
+      requestHtml: toHtml(req.body.message),
+      ...(response ? addResponseToMessage({}, response) : {})
+    }
+  } else {
+    return {
+      person: req.body.person,
+      conversation: true
+    }
   }
 }
 
 const getChatAgent = (res) => {
-  return chatAgents[res.locals.type][res.locals.chatId]
+  return chatAgents[
+    res.locals.isConversation ? res.locals.person : res.locals.type
+  ][res.locals.chatId]
 }
 
 const parentMessageId = (chatHistory) => {
   const parentMessage = chatHistory.messages[chatHistory.messages.length - 1]
   return parentMessage ? parentMessage.id : null
+}
+
+const conversationParentMessageId = (chatHistory) => {
+  const parentMessage = chatHistory.messages[chatHistory.messages.length - 2]
+  return parentMessage ? parentMessage.id : null
+}
+
+const previousConversationMessage = (chatHistory) => {
+  const messages = chatHistory.messages
+  if (messages.length === 0) {
+    return 'Hey, how are you?'
+  }
+  return messages[messages.length - 1].message
 }
 
 export default (router) => {
@@ -58,38 +80,42 @@ export default (router) => {
       createdAt: DateTime.now().toISO()
     }
 
-    if (!chats[chatId]) {
-      chats[chatId] = chatHistory
-    }
+    chats[chatId] = chats[chatId] || chatHistory
+    chatAgents[type] = chatAgents[type] || {}
+    chatAgents[type][chatId] = chatAgents[type][chatId] || chatAgent(systemPrompts[type] || '')
+    chatAgents.person1 = {}
+    chatAgents.person2 = {}
 
-    if (!chatAgents[type]) {
-      chatAgents[type] = {}
-    }
-
-    if (!chatAgents[type][chatId]) {
-      chatAgents[type][chatId] = chatAgent(systemPrompts[type] || '')
+    if (type === 'conversation' && !chatAgents.person1[chatId]) {
+      chatAgents.person1[chatId] = chatAgent(systemPrompts.person1)
+      chatAgents.person2[chatId] = chatAgent(systemPrompts.person2)
     }
 
     res.locals.chatId = chatId
     res.locals.type = type
     res.locals.chatHistory = chatHistory
-
     next()
-  })
-
-  router.get('/chat/:type/:id', (req, res) => {
-    res.render('chat')
   })
 
   router.get('/chat/conversation/:id', (req, res) => {
     res.render('conversation')
   })
 
+  router.get('/chat/:type/:id', (req, res) => {
+    res.render('chat')
+  })
+
+  router.post('/chat/conversation/:id/stream', async (req, res, next) => {
+    res.locals.isConversation = true
+    res.locals.person = req.body.person
+    next()
+  })
+
   router.post('/chat/:type/:id/stream', async (req, res) => {
     const chatAgent = getChatAgent(res)
     const chatHistory = res.locals.chatHistory
     const chatMessage = getChatMessage(req)
-
+    const messageToSend = req.body.message || previousConversationMessage(chatHistory)
     res.set({
       'Content-Type': 'text/plain',
       'Transfer-Encoding': 'chunked'
@@ -99,8 +125,10 @@ export default (router) => {
       'Content-Type': 'application/json'
     })
 
-    const response = await chatAgent.sendMessage(req.body.message, {
-      parentMessageId: parentMessageId(chatHistory),
+    const response = await chatAgent.sendMessage(messageToSend, {
+      parentMessageId: res.locals.isConversation
+        ? conversationParentMessageId(chatHistory)
+        : parentMessageId(chatHistory),
       onProgress: (partialResponse) => {
         addResponseToMessage(chatMessage, partialResponse)
         stream.write(JSON.stringify(chatMessage))
@@ -111,18 +139,5 @@ export default (router) => {
     chatMessage.response = response
     chatHistory.messages.push(chatMessage)
     stream.end()
-  })
-
-  router.post('/chat/:type/:id/endpoint', async (req, res) => {
-    const chatAgent = getChatAgent(res)
-    const chatHistory = res.locals.chatHistory
-    const response = await chatAgent.sendMessage(req.body.message, {
-      parentMessageId: parentMessageId(chatHistory)
-    })
-
-    const chatMessage = getChatMessage(req, response)
-    chatMessage.response = response
-    chatHistory.messages.push(chatMessage)
-    res.json(chatMessage)
   })
 }

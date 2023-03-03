@@ -19,7 +19,11 @@
 
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
-        <form method="post" data-endpoint="/chat/{{ type }}/{{ chatId }}/stream">
+        <form
+          method="post"
+          data-endpoint="/chat/{{ type }}/{{ chatId }}/stream"
+          class="app-chat-form"
+        >
         {{ govukTextarea({
           id: "chat",
           name: "chat",

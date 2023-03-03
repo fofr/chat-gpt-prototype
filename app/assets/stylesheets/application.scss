@@ -88,32 +88,46 @@ code, pre {
     max-width: 100%;
   }
 
+  &::before {
+    font-size: 16px;
+    color: #10403c;
+    background: #bfe3e0;
+    text-transform: uppercase;
+    font-weight: bold;
+    padding: govuk-spacing(1) govuk-spacing(2);
+    margin-bottom: govuk-spacing(2);
+    display: inline-block;
+  }
+
   &--user {
     &::before {
       content: 'You';
-      font-size: 16px;
-      color: #10403c;
-      background: #bfe3e0;
-      text-transform: uppercase;
-      font-weight: bold;
-      padding: govuk-spacing(1) govuk-spacing(2);
-      margin-bottom: govuk-spacing(2);
-      display: inline-block;
     }
+  }
+
+  &--person2 {
+    &::before {
+      content: 'Person 2';
+    }
+  }
+
+  &--person1 {
+    &::before {
+      content: 'Person 1';
+      color: #144e81;
+      background: #d2e2f1;
+    }
+
+    background-color: govuk-colour("light-grey");
   }
 
   &--assistant {
     &::before {
       content: 'Bot';
-      font-size: 16px;
       color: #144e81;
       background: #d2e2f1;
-      text-transform: uppercase;
-      font-weight: bold;
-      padding: govuk-spacing(1) govuk-spacing(2);
-      margin-bottom: govuk-spacing(2);
-      display: inline-block;
     }
+
     background-color: govuk-colour("light-grey");
   }
 }

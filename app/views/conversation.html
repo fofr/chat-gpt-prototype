@@ -1,0 +1,37 @@
+{% extends "layouts/default.html" %}
+{% set title = "Conversation" %}
+{% set chat = data.chats[chatId] %}
+{% set personId = 1 %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h2 class="govuk-heading-xl">{{ title }}</h2>
+      <div id="chat-output" class="chat-output govuk-body">
+        {% if chat and chat.messages | length %}
+          {% for message in chat.messages %}
+            <div class="message message--{{ message.person }}">{{ message.messageHtml | safe }}</div>
+            {% if loop.last and message.person === 'person1' %}
+              {% set personId = 2 %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      </div>
+
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <form
+          method="post"
+          class="app-conversation-form"
+          data-endpoint="/chat/conversation/{{ chatId }}/stream"
+          data-person-id="{{ personId }}"
+        >
+          {{ govukButton({
+            text: "Continue conversation"
+          }) }}
+        </form>
+      </div>
+    </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,28 +1,29 @@
 export default () => {
-  const endpoint = document.querySelector('form').getAttribute('data-endpoint')
+  const messageForm = document.querySelector('.app-chat-form')
+  const endpoint = messageForm.getAttribute('data-endpoint')
   const chatOutput = document.getElementById('chat-output')
+  const messageInput = document.getElementById('chat')
 
-  // when I hit enter, submit the form
-  document.getElementById('chat').addEventListener('keyup', (event) => {
+  messageInput.addEventListener('keyup', (event) => {
     if (event.shiftKey || event.ctrlKey || event.altKey) {
       return
     }
-
     if (event.key === 'Enter') {
       sendValue(event)
     }
   })
 
-  // when I submit the form, send the message
-  document.querySelector('form').addEventListener('submit', (event) => {
+  messageForm.addEventListener('submit', (event) => {
     sendValue(event)
   })
 
   const sendValue = (event) => {
     event.preventDefault()
-    const value = document.getElementById('chat').value
-    document.getElementById('chat').value = ''
-    streamChat(value.replace(/\n+$/, ''))
+    if (messageInput && messageInput.value) {
+      const value = messageInput.value
+      messageInput.value = ''
+      streamChat(value.replace(/\n+$/, ''))
+    }
   }
 
   // method to use the fetch api to stream responses from a server
@@ -37,30 +38,24 @@ export default () => {
       })
     })
 
-    const user = document.createElement('div')
-    user.classList.add('message')
-    user.classList.add('message--user')
-    chatOutput.appendChild(user)
+    const userMessageContainer = document.createElement('div')
+    userMessageContainer.classList.add('message', 'message--user')
+    chatOutput.appendChild(userMessageContainer)
 
-    const assistant = document.createElement('div')
-    assistant.classList.add('message')
-    assistant.classList.add('message--assistant')
-    chatOutput.appendChild(assistant)
+    const assistantMessageContainer = document.createElement('div')
+    assistantMessageContainer.classList.add('message', 'message--assistant')
+    chatOutput.appendChild(assistantMessageContainer)
 
     const reader = response.body.getReader()
 
     while (true) {
       const { done, value } = await reader.read()
+      if (done) { break }
 
-      if (done) {
-        break
-      }
-
-      const message = new TextDecoder('utf-8').decode(value)
       try {
-        const json = JSON.parse(message)
-        user.innerHTML = `<p>${json.requestHtml}</p>`
-        assistant.innerHTML = `<p>${json.messageHtml}</p>`
+        const json = JSON.parse(new TextDecoder('utf-8').decode(value))
+        userMessageContainer.innerHTML = json.requestHtml
+        assistantMessageContainer.innerHTML = json.messageHtml
         window.scrollTo(0, document.body.scrollHeight)
       } catch (e) {
         console.log(e)

@@ -8,10 +8,17 @@ import { initAll as GOVUKFrontend } from 'govuk-frontend'
 import { initAll as GOVUKPrototypeComponents } from 'govuk-prototype-components'
 
 import chat from './chat'
+import conversation from './conversation'
 
 // Initiate scripts on page load
 document.addEventListener('DOMContentLoaded', () => {
   GOVUKFrontend()
   GOVUKPrototypeComponents()
-  chat()
+  if (document.querySelector('.app-chat-form')) {
+    chat()
+  }
+
+  if (document.querySelector('.app-conversation-form')) {
+    conversation()
+  }
 })
