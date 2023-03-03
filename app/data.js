@@ -8,6 +8,7 @@
  */
 export default {
   // Set feature flags using the `features` key
+  chats: {},
   features: {
     validation: {
       on: false,

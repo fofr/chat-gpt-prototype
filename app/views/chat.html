@@ -10,6 +10,7 @@
       </div>
 
       <form method="post">
+        <input type="hidden" name="chat-id" id="chat-id" value="1234">
         {{ govukTextarea({
           "id": "chat",
           "name": "chat",
@@ -36,7 +37,9 @@
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ message })
+        body: JSON.stringify({
+          message, 'chat-id': document.getElementById('chat-id').value
+        })
       })
 
       const json = await response.json()
