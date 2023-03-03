@@ -17,26 +17,32 @@
         {% endif %}
       </div>
 
-      <form method="post" data-endpoint="/chat/{{ type }}/{{ chatId }}/endpoint">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <form method="post" data-endpoint="/chat/{{ type }}/{{ chatId }}/stream">
         {{ govukTextarea({
-          "id": "chat",
-          "name": "chat",
-          "label": {
-            "text": "Your message",
-            "classes": "govuk-label--m"
+          id: "chat",
+          name: "chat",
+          label: {
+            text: "Message",
+            classes: "govuk-label--m"
           },
-          "rows": 4
+          rows: 4
         }) }}
 
         {{ govukButton({
-          "text": "Send message"
+          text: "Send message",
+          classes: "govuk-visually-hidden"
         }) }}
       </form>
+      </div>
+    </div>
     </div>
   </div>
 
   <script>
     const endpoint = document.querySelector('form').getAttribute('data-endpoint')
+    const chatOutput = document.getElementById('chat-output')
 
     // method to send a message to the server
     const sendMessage = async () => {
@@ -61,7 +67,7 @@
 
       if (event.keyCode === 13) {
         event.preventDefault()
-        sendMessage()
+        streamChat()
         document.getElementById('chat').value = ''
       }
     })
@@ -69,7 +75,7 @@
     // when I submit the form, send the message
     document.querySelector('form').addEventListener('submit', (event) => {
       event.preventDefault()
-      sendMessage()
+      streamChat()
     })
 
     // method to use the fetch api to stream responses from a server
@@ -80,9 +86,19 @@
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          message: document.getElementById('chat').value
+          message: document.getElementById('chat').value.replace(/\n+$/, '')
         })
       })
+
+      const user = document.createElement('div')
+      user.classList.add('message')
+      user.classList.add('message--user')
+      chatOutput.appendChild(user)
+
+      const assistant = document.createElement('div')
+      assistant.classList.add('message')
+      assistant.classList.add('message--assistant')
+      chatOutput.appendChild(assistant)
 
       const reader = response.body.getReader()
 
@@ -94,7 +110,14 @@
         }
 
         const message = new TextDecoder('utf-8').decode(value)
-        document.getElementById('chat').innerHTML += `<p>${message}</p>`
+        try {
+          const json = JSON.parse(message)
+          user.innerHTML = `<p>${json.requestHtml}</p>`
+          assistant.innerHTML = `<p>${json.messageHtml}</p>`
+          window.scrollTo(0, document.body.scrollHeight)
+        } catch (e) {
+          console.log(e)
+        }
       }
     }
   </script>

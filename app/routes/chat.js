@@ -71,9 +71,45 @@ export default (router) => {
     res.render('chat')
   })
 
+  router.post('/chat/:type/:id/stream', async (req, res) => {
+    const chatAgent = chatAgents[res.locals.type][res.locals.chatId]
+    const chatHistory = res.locals.chatHistory
+    const chatMessage = {
+      request: req.body.message,
+      requestHtml: toHtml(req.body.message)
+    }
+
+    res.set({
+      'Content-Type': 'text/plain',
+      'Transfer-Encoding': 'chunked'
+    })
+
+    const stream = res.writeHead(200, {
+      'Content-Type': 'application/json'
+    })
+
+    const response = await chatAgent.sendMessage(req.body.message, {
+      parentMessageId: parentMessageId(chatHistory),
+      onProgress: (partialResponse) => {
+        chatMessage.id = partialResponse.id
+        chatMessage.message = partialResponse.text
+        chatMessage.messageHtml = toHtml(partialResponse.text)
+        stream.write(JSON.stringify(chatMessage))
+      }
+    })
+
+    chatMessage.id = response.id
+    chatMessage.message = response.text
+    chatMessage.messageHtml = toHtml(response.text)
+    chatMessage.response = response
+    chatHistory.messages.push(chatMessage)
+    stream.end()
+  })
+
   router.post('/chat/:type/:id/endpoint', async (req, res) => {
     const chatAgent = chatAgents[res.locals.type][res.locals.chatId]
     const chatHistory = res.locals.chatHistory
+
     const response = await chatAgent.sendMessage(req.body.message, {
       parentMessageId: parentMessageId(chatHistory)
     })
