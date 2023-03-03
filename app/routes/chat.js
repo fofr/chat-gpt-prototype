@@ -1,41 +1,9 @@
 import MarkdownIt from 'markdown-it'
 import { ChatGPTAPI } from 'chatgpt'
 import { DateTime } from 'luxon'
+import systemPrompts from '../helpers/system-prompts.js'
 const md = new MarkdownIt()
 const chatAgents = {}
-
-const systemPrompts = {
-  govuk: `
-Give all responses in markdown format.
-Using headings to break down long answers, starting from h3 level (\`###\`).
-Write all content in GOV.UK style. Be concise and use active voice.
-Limit responses to 2 paragraphs.`,
-  prototyper: `
-You are an assistant to a GOV.UK interaction designer. You are helping them to create a prototype of a new government service.
-You need to assist them in determining user journeys, form fields, and content for the prototype.
-Write all content in GOV.UK style. Be concise and use active voice. Do not say please.
-
-Always give examples in the YAML format wrapped in a code block.
-
-YAML for a page must start in the format:
-\`\`\`
-title: "Page title"
-slug: "page-slug"
-\`\`\`
-
-When giving examples of input fields, do so in a format like:
-\`\`\`
-type: "text"
-label: "Child's name"
-decorate: "child-name"
-\`\`\`
-
-For radios and checkboxes, use \`items\` instead of \`options\`.
-
-Always give examples in the YAML format wrapped in a code block.
-`
-}
-
 const chatAgent = (systemMessage) => {
   return new ChatGPTAPI({
     apiKey: process.env.OPENAI_API_KEY,
@@ -45,6 +13,24 @@ const chatAgent = (systemMessage) => {
 
 const toHtml = (markdown) => {
   return md.render(markdown)
+}
+
+const addResponseToMessage = (message, response) => {
+  message.id = response.id
+  message.message = response.text
+  message.messageHtml = toHtml(response.text)
+}
+
+const getChatMessage = (req, response) => {
+  return {
+    request: req.body.message,
+    requestHtml: toHtml(req.body.message),
+    ...(response ? addResponseToMessage({}, response) : {})
+  }
+}
+
+const getChatAgent = (res) => {
+  return chatAgents[res.locals.type][res.locals.chatId]
 }
 
 const parentMessageId = (chatHistory) => {
@@ -95,13 +81,14 @@ export default (router) => {
     res.render('chat')
   })
 
+  router.get('/chat/conversation/:id', (req, res) => {
+    res.render('conversation')
+  })
+
   router.post('/chat/:type/:id/stream', async (req, res) => {
-    const chatAgent = chatAgents[res.locals.type][res.locals.chatId]
+    const chatAgent = getChatAgent(res)
     const chatHistory = res.locals.chatHistory
-    const chatMessage = {
-      request: req.body.message,
-      requestHtml: toHtml(req.body.message)
-    }
+    const chatMessage = getChatMessage(req)
 
     res.set({
       'Content-Type': 'text/plain',
@@ -115,39 +102,26 @@ export default (router) => {
     const response = await chatAgent.sendMessage(req.body.message, {
       parentMessageId: parentMessageId(chatHistory),
       onProgress: (partialResponse) => {
-        chatMessage.id = partialResponse.id
-        chatMessage.message = partialResponse.text
-        chatMessage.messageHtml = toHtml(partialResponse.text)
+        addResponseToMessage(chatMessage, partialResponse)
         stream.write(JSON.stringify(chatMessage))
       }
     })
 
-    chatMessage.id = response.id
-    chatMessage.message = response.text
-    chatMessage.messageHtml = toHtml(response.text)
+    addResponseToMessage(chatMessage, response)
     chatMessage.response = response
     chatHistory.messages.push(chatMessage)
     stream.end()
   })
 
   router.post('/chat/:type/:id/endpoint', async (req, res) => {
-    const chatAgent = chatAgents[res.locals.type][res.locals.chatId]
+    const chatAgent = getChatAgent(res)
     const chatHistory = res.locals.chatHistory
-
     const response = await chatAgent.sendMessage(req.body.message, {
       parentMessageId: parentMessageId(chatHistory)
     })
 
-    const chatMessage =
-      {
-        request: req.body.message,
-        requestHtml: toHtml(req.body.message),
-        id: response.id,
-        message: response.text,
-        messageHtml: toHtml(response.text),
-        response
-      }
-
+    const chatMessage = getChatMessage(req, response)
+    chatMessage.response = response
     chatHistory.messages.push(chatMessage)
     res.json(chatMessage)
   })
