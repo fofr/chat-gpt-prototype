@@ -7,10 +7,16 @@
       <h2 class="govuk-heading-xl">{{ title }}</h2>
       <div id="chat-output" class="chat-output govuk-body">
         <p class="govuk-!-margin-bottom-0">Hi, I’m a chatbot. Ask me a question.</p>
+
+        {% if data.chats[chatId] %}
+          {% for message in data.chats[chatId].messages %}
+            <div class="message message--user">{{ message.requestHtml | safe }}</div>
+            <div class="message message--assistant">{{ message.messageHtml | safe }}</div>
+          {% endfor %}
+        {% endif %}
       </div>
 
-      <form method="post">
-        <input type="hidden" name="chat-id" id="chat-id" value="1234">
+      <form method="post" data-endpoint="/chat/{{ type }}/{{ chatId }}/endpoint">
         {{ govukTextarea({
           "id": "chat",
           "name": "chat",
@@ -22,24 +28,22 @@
         }) }}
 
         {{ govukButton({
-          "text": "Send"
+          "text": "Send message"
         }) }}
       </form>
     </div>
   </div>
 
   <script>
+    const endpoint = document.querySelector('form').getAttribute('data-endpoint')
+
     // method to send a message to the server
     const sendMessage = async () => {
       const message = document.getElementById('chat').value
-      const response = await fetch('/chat-endpoint', {
+      const response = await fetch(endpoint, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          message, 'chat-id': document.getElementById('chat-id').value
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message })
       })
 
       const json = await response.json()
@@ -49,6 +53,11 @@
 
     // when I hit enter, submit the form
     document.getElementById('chat').addEventListener('keyup', (event) => {
+      // dont submit the form if the enter key is being modified
+      if (event.shiftKey || event.ctrlKey || event.altKey) {
+        return
+      }
+
       if (event.keyCode === 13) {
         event.preventDefault()
         sendMessage()
@@ -62,9 +71,9 @@
       sendMessage()
     })
 
-    // method to use the fetch api to stream responses from a server at the /chat-endpoint url
+    // method to use the fetch api to stream responses from a server
     const streamChat = async () => {
-      const response = await fetch('/chat-endpoint', {
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
