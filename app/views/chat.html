@@ -6,9 +6,10 @@
     <div class="govuk-grid-column-two-thirds-from-desktop">
       <h2 class="govuk-heading-xl">{{ title }}</h2>
       <div id="chat-output" class="chat-output govuk-body">
-        <p class="govuk-!-margin-bottom-0">Hi, I’m a chatbot. Ask me a question.</p>
-
-        {% if data.chats[chatId] %}
+        <div class="message message--assistant">
+          <p>Hello. How can I help?</p>
+        </div>
+        {% if data.chats[chatId] and data.chats[chatId].messages | length %}
           {% for message in data.chats[chatId].messages %}
             <div class="message message--user">{{ message.requestHtml | safe }}</div>
             <div class="message message--assistant">{{ message.messageHtml | safe }}</div>

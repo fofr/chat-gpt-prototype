@@ -1,4 +1,6 @@
 {% extends "template.njk" %}
+{% from "components/header/macro.njk" import appHeader %}
+{% from "components/footer/macro.njk" import appFooter %}
 
 {% block head %}
   <link rel="stylesheet" href="/public/stylesheets/application.css" media="all">
@@ -14,7 +16,7 @@
 {% set bodyAttributes = {"data-module": "edge"} %}
 
 {% block header %}
-  {{ govukHeader({
+  {{ appHeader({
     homepageUrl: "/",
     productName: productName,
     serviceName: serviceName if not productName,
@@ -24,18 +26,11 @@
 {% endblock %}
 
 {% block beforeContent %}
-  {{ govukPhaseBanner({
-    tag: {
-      text: "Prototype"
-    },
-    text: "This is a prototype of a new service. Some parts may not work yet."
-  }) }}
-
   {% block pageNavigation %}{% endblock %}
 {% endblock %}
 
 {% block footer %}
-  {{ govukFooter({
+  {{ appFooter({
     meta: {
       items: [{
         text: "Clear session data",
