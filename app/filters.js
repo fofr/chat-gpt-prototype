@@ -37,6 +37,15 @@ export default (env) => {
     return JSON.stringify(obj)
   }
 
+  // truncate text to the first x characters
+  filters.truncate = (string, length = 100) => {
+    if (string.length > length) {
+      return string.substring(0, length) + '…'
+    } else {
+      return string + '…'
+    }
+  }
+
   // example: "not like this" becomes "Not like this"
   // do not error when string is undefined
   filters.capitaliseFirstLetter = string => {

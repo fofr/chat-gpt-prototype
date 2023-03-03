@@ -2,33 +2,53 @@
 {% block pageTitle %}Prototype{% endblock %}
 
 {% block header %}
-  {{ govukHeader({
+  {{ appHeader({
     homepageUrl: "/",
     serviceUrl: "/",
     containerClasses: "govuk-width-container"
   }) }}
-
-  <div class="app-masthead">
-    <div class="govuk-width-container">
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds-from-desktop">
-          <h1 class="app-masthead__title govuk-heading-xl govuk-!-margin-bottom-3">
-            Prototype
-          </h1>
-        </div>
-      </div>
-    </div>
-  </div>
 {% endblock %}
 
 {% block beforeContent %}
 {% endblock %}
 
 {% block content %}
-
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-      <p>Nothing here yet</p>
+      <h1 class="govuk-heading-xl">
+        Chat types
+      </h1>
+
+      <ul class="govuk-list">
+        <li>
+          <h3 class="govuk-heading-m">GOV.UK Chat</h3>
+          <p>Responds in a GOV.UK style, formatted with markdown.</p>
+          <a href="/chat/govuk/new">New chat</a>
+        </li>
+      </ul>
+
+      <h2 class="govuk-heading-l">
+        Chat history
+      </h2>
+
+      <ul class="govuk-list">
+        {% for key, chat in data.chats %}
+          <li>
+            {% if chat.messages.length > 0 %}
+              <span class="govuk-caption-m">
+                {{ chat.type }}
+              </span>
+              <a href="/chat/{{ chat.type }}/{{ key }}">
+
+                {{ chat.createdAt | govukDate }} {{ chat.createdAt | govukTime }}
+              </a>
+              <p>
+                {{ chat.messages[0].request | truncate(100) }}
+              </p>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
     </div>
   </div>
 {% endblock %}

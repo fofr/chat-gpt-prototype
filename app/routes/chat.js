@@ -1,10 +1,11 @@
 import MarkdownIt from 'markdown-it'
 import { ChatGPTAPI } from 'chatgpt'
+import { DateTime } from 'luxon'
 const md = new MarkdownIt()
 const chatAgents = {}
 
 const systemPrompts = {
-  markdown: `
+  govuk: `
 Give all responses in markdown format.
 Using headings to break down long answers, starting from h3 level (\`###\`).
 Write all content in GOV.UK style. Be concise and use active voice.
@@ -28,6 +29,11 @@ const parentMessageId = (chatHistory) => {
 }
 
 export default (router) => {
+  router.all('/chat/:type/new', (req, res, next) => {
+    const chatId = Math.random().toString(36).slice(2, 5).toUpperCase()
+    res.redirect(`/chat/${req.params.type}/${chatId}`)
+  })
+
   router.all([
     '/chat/:type/:id',
     '/chat/:type/:id/*'
@@ -35,7 +41,12 @@ export default (router) => {
     const type = req.params.type
     const chatId = req.params.id
     const chats = req.session.data.chats
-    const chatHistory = chats[chatId] || { id: chatId, messages: [] }
+    const chatHistory = chats[chatId] || {
+      id: chatId,
+      messages: [],
+      type,
+      createdAt: DateTime.now().toISO()
+    }
 
     if (!chats[chatId]) {
       chats[chatId] = chatHistory
@@ -80,36 +91,4 @@ export default (router) => {
     chatHistory.messages.push(chatMessage)
     res.json(chatMessage)
   })
-
-  // router.post('/chat-endpoint', async (req, res) => {
-  //   const chatId = req.body['chat-id']
-  //   const chats = req.session.data.chats
-  //   const chatHistory = chats[chatId] || { id: chatId, messages: [] }
-  //   if (!chats[chatId]) {
-  //     chats[chatId] = chatHistory
-  //   }
-
-  //   const parentMessage = chatHistory.messages[chatHistory.messages.length - 1]
-  //   const parentMessageId = parentMessage ? parentMessage.id : null
-  //   let response
-
-  //   if (parentMessageId) {
-  //     response = await markdownChatAgent.sendMessage(req.body.message, { parentMessageId })
-  //   } else {
-  //     response = await markdownChatAgent.sendMessage(req.body.message)
-  //   }
-
-  //   const chatMessage =
-  //     {
-  //       request: req.body.message,
-  //       requestHtml: toHtml(req.body.message),
-  //       id: response.id,
-  //       message: response.text,
-  //       messageHtml: toHtml(response.text),
-  //       response
-  //     }
-
-  //   chatHistory.messages.push(chatMessage)
-  //   res.json(chatMessage)
-  // })
 }
