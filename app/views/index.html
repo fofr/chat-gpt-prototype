@@ -20,37 +20,14 @@
       </h1>
 
       <ul class="govuk-list">
-        <li>
-          <h3 class="govuk-heading-m govuk-!-margin-bottom-1">GOV.UK Chat</h3>
-          <p>Responds in a GOV.UK style, formatted with markdown.</p>
-          <a href="/chat/govuk/new">New GOV.UK chat</a>
-        </li>
-        <li>
-          <h3 class="govuk-heading-m govuk-!-margin-top-6 govuk-!-margin-bottom-1">Conversation</h3>
-          <p>A chat between two bots.</p>
-          <a href="/chat/conversation/new">New conversation</a>
-        </li>
-      </ul>
-
-      <h2 class="govuk-heading-l">
-        Chat history
-      </h2>
-
-      <ul class="govuk-list">
-        {% for key, chat in data.chats %}
+        {% for key, prompt in prompts %}
           <li>
-            {% if chat.messages.length > 0 %}
-              {% set firstMessage = chat.messages[0] %}
-              <span class="govuk-caption-m">
-                {{ chat.type }}
-              </span>
-              <a href="/chat/{{ chat.type }}/{{ key }}">
-                {{ chat.createdAt | govukDate }} {{ chat.createdAt | govukTime }}
-              </a>
-              <p>
-                {{ (firstMessage.request if firstMessage.request else firstMessage.message) | truncate(100) }}
-              </p>
-            {% endif %}
+            <h3 class="govuk-heading-m govuk-!-margin-bottom-1">
+              <a href="/chat/{{ key }}/new">{{ prompt.name }}</a>
+            </h3>
+            <p>
+              {{ prompt.description }}
+            </p>
           </li>
         {% endfor %}
       </ul>

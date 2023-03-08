@@ -1,7 +1,12 @@
 import ChatAgent from '../models/chat-agent.js'
-import Prompts from '../models/prompts.js'
+import prompts from '../models/prompts.js'
 
 export default (router) => {
+  router.get('/', (req, res, next) => {
+    res.locals.prompts = prompts()
+    next()
+  })
+
   router.all('/chat/:type/new', (req, res, next) => {
     const id = Math.random().toString(36).slice(2, 5).toUpperCase()
     res.redirect(`/chat/${req.params.type}/${id}`)
@@ -13,14 +18,15 @@ export default (router) => {
   ], (req, res, next) => {
     const id = req.params.id
     const type = req.params.type
+    const prompt = prompts()[type]
     const chatAgent = ChatAgent.get(id) || new ChatAgent({
       id,
       type,
-      systemMessage: Prompts[type].systemMessage,
-      useMarkdown: true
+      systemMessage: prompt.systemMessage,
+      useMarkdown: prompt.markdown
     })
 
-    res.locals.prompt = Prompts[type]
+    res.locals.prompt = prompt
     res.locals.chatId = id
     res.locals.type = type
     res.locals.chatAgent = chatAgent
