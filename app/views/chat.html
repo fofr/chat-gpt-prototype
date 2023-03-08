@@ -9,12 +9,10 @@
         <div class="message message--assistant">
           <p>Hello. How can I help?</p>
         </div>
-        {% if data.chats[chatId] and data.chats[chatId].messages | length %}
-          {% for message in data.chats[chatId].messages %}
-            <div class="message message--user">{{ message.requestHtml | safe }}</div>
-            <div class="message message--assistant">{{ message.messageHtml | safe }}</div>
-          {% endfor %}
-        {% endif %}
+        {% for m in chatAgent.messages %}
+          <div class="message message--user">{{ m.messageHtml | safe }}</div>
+          <div class="message message--assistant">{{ m.html | safe }}</div>
+        {% endfor %}
       </div>
 
     <div class="govuk-grid-row">

@@ -54,8 +54,8 @@ export default () => {
 
       try {
         const json = JSON.parse(new TextDecoder('utf-8').decode(value))
-        userMessageContainer.innerHTML = json.requestHtml
-        assistantMessageContainer.innerHTML = json.messageHtml
+        userMessageContainer.innerHTML = json.messageHtml
+        assistantMessageContainer.innerHTML = json.html
         window.scrollTo(0, document.body.scrollHeight)
       } catch (e) {
         console.log(e)
