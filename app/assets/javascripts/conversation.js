@@ -1,5 +1,6 @@
 export default () => {
   const messageForm = document.querySelector('.app-conversation-form')
+  const startConversationForm = document.querySelector('.app-start-conversation-form')
   const endpoint = messageForm.getAttribute('data-endpoint')
   const chatOutput = document.getElementById('chat-output')
 
@@ -7,28 +8,44 @@ export default () => {
     sendValue(event)
   })
 
-  const sendValue = (event) => {
+  startConversationForm.addEventListener('submit', (event) => {
+    sendValue(event, true)
+  })
+
+  const sendValue = (event, isStarting) => {
     event.preventDefault()
-    streamChat()
+    streamChat(isStarting)
   }
 
   // method to use the fetch api to stream responses from a server
-  const streamChat = async () => {
+  const streamChat = async (isStarting) => {
     const personId = messageForm.getAttribute('data-person-id')
+    const body = {
+      person: `person${personId}`
+    }
+
+    if (isStarting) {
+      body.message = document.getElementById('first-message').value
+    }
+
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        person: `person${personId}`
-      })
+      body: JSON.stringify(body)
     })
 
     const messageContainer = document.createElement('div')
     messageContainer.classList.add('message')
     messageContainer.classList.add(`message--person${personId}`)
     chatOutput.appendChild(messageContainer)
+
+    if (isStarting) {
+      startConversationForm.style.display = 'none'
+      messageForm.style.display = 'block'
+      chatOutput.style.display = 'block'
+    }
 
     const reader = response.body.getReader()
 
@@ -48,7 +65,7 @@ export default () => {
   }
 
   // if no messages have been sent, start the conversation
-  if (chatOutput.children.length === 0) {
-    streamChat()
-  }
+  // if (chatOutput.children.length === 0) {
+  //   streamChat()
+  // }
 }

@@ -7,7 +7,7 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       <h2 class="govuk-heading-xl">{{ title }}</h2>
-      <div id="chat-output" class="chat-output govuk-body">
+      <div id="chat-output" class="chat-output govuk-body" {% if not chat or chat.messages.length == 0 %}style="display: none"{% endif %}>
         {% if chat and chat.messages | length %}
           {% for message in chat.messages %}
             <div class="message message--{{ message.person }}">{{ message.messageHtml | safe }}</div>
@@ -25,9 +25,32 @@
           class="app-conversation-form"
           data-endpoint="/chat/conversation/{{ chatId }}/stream"
           data-person-id="{{ personId }}"
+          {% if not chat or chat.messages.length == 0 %}style="display: none"{% endif %}
         >
           {{ govukButton({
             text: "Continue conversation"
+          }) }}
+        </form>
+
+        <form
+          method="post"
+          class="app-start-conversation-form"
+          data-endpoint="/chat/conversation/{{ chatId }}/stream?start=true"
+          data-person-id="{{ personId }}"
+          {% if chat and chat.messages | length %}style="display: none"{% endif %}
+        >
+          {{ govukTextarea({
+            name: "first-message",
+            id: "first-message",
+            label: {
+              text: "First message in conversation"
+            },
+            rows: 5,
+            classes: "app-starting-message"
+          }) }}
+
+          {{ govukButton({
+            text: "Start conversation"
           }) }}
         </form>
       </div>

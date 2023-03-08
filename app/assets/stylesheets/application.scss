@@ -6,6 +6,11 @@ $govuk-assets-path: "/govuk/assets/";
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
 $govuk-font-family: "Inter", "HelveticaNeue", "Helvetica Neue", "Arial", "Helvetica", sans-serif;
 
+@import "node_modules/govuk-frontend/govuk/base";
+
+$govuk-button-background-colour: govuk-colour("blue");
+@import "node_modules/govuk-frontend/govuk/components/button/index";
+
 // Import GOV.UK Frontend
 @import "govuk-frontend/govuk/all";
 
@@ -54,8 +59,8 @@ $govuk-font-family: "Inter", "HelveticaNeue", "Helvetica Neue", "Arial", "Helvet
 }
 
 .chat-output {
-  margin-bottom: govuk-spacing(8);
   border: 2px solid $govuk-border-colour;
+  margin-bottom: govuk-spacing(8);
 }
 
 
