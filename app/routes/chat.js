@@ -1,4 +1,5 @@
 import ChatAgent from '../models/chat-agent.js'
+import Prompts from '../models/prompts.js'
 
 export default (router) => {
   router.all('/chat/:type/new', (req, res, next) => {
@@ -12,13 +13,14 @@ export default (router) => {
   ], (req, res, next) => {
     const id = req.params.id
     const type = req.params.type
-
     const chatAgent = ChatAgent.get(id) || new ChatAgent({
       id,
       type,
+      systemMessage: Prompts[type].systemMessage,
       useMarkdown: true
     })
 
+    res.locals.prompt = Prompts[type]
     res.locals.chatId = id
     res.locals.type = type
     res.locals.chatAgent = chatAgent

@@ -15,6 +15,7 @@ class ChatAgent {
       systemMessage: options.systemMessage || ''
     })
 
+    this.systemMessage = options.systemMessage || ''
     this.type = options.type
     this.createdAt = DateTime.now().toISO()
     this.useMarkdown = options.useMarkdown || false

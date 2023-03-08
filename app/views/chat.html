@@ -1,14 +1,22 @@
 {% extends "layouts/default.html" %}
-{% set title = "Chat" %}
+{% set title = prompt.name + " chat" %}
 
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      <h2 class="govuk-heading-xl">{{ title }}</h2>
-      <div id="chat-output" class="chat-output govuk-body">
-        <div class="message message--assistant">
-          <p>Hello. How can I help?</p>
-        </div>
+      <h2 class="govuk-heading-l govuk-!-margin-bottom-2">{{ title }}</h2>
+      <p>{{ prompt.description }}</p>
+
+      {{ govukDetails({
+        summaryText: "System prompt",
+        html: "<pre>" + chatAgent.systemMessage + "</pre>"
+      }) }}
+
+      <div
+        id="chat-output"
+        class="chat-output govuk-body"
+        {% if (chatAgent.messages.length == 0) %}style="display: none"{% endif %}
+      >
         {% for m in chatAgent.messages %}
           <div class="message message--user">{{ m.messageHtml | safe }}</div>
           <div class="message message--assistant">{{ m.html | safe }}</div>

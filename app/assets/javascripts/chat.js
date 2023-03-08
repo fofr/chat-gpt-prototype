@@ -56,6 +56,7 @@ export default () => {
         const json = JSON.parse(new TextDecoder('utf-8').decode(value))
         userMessageContainer.innerHTML = json.messageHtml
         assistantMessageContainer.innerHTML = json.html
+        chatOutput.style.display = 'block'
         window.scrollTo(0, document.body.scrollHeight)
       } catch (e) {
         console.log(e)
