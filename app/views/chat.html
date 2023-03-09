@@ -1,6 +1,15 @@
 {% extends "layouts/default.html" %}
 {% set title = prompt.name %}
 
+{% block chatHead %}
+  {% for stylesheet in prompt.stylesheets %}
+    <link rel="stylesheet" href="{{ stylesheet }}">
+  {% endfor %}
+  {% for script in prompt.scripts %}
+    <script src="{{ script }}"></script>
+  {% endfor %}
+{% endblock %}
+
 {% block content %}
   <div class="govuk-grid-row app-chat--{{ prompt.key }}">
     <div class="govuk-grid-column-full">
