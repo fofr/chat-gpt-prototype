@@ -26,14 +26,7 @@ const canvas = (container) => {
 }
 
 const p5js = (container) => {
-  // if not already loaded, load p5.js
-  if (!window.p5) {
-    const script = document.createElement('script')
-    script.src = 'https://cdn.jsdelivr.net/npm/p5@1.6.0/lib/p5.js'
-    document.body.appendChild(script)
-  }
-
-  canvas(container, true)
+  canvas(container)
 }
 
 const abc = (container) => {
@@ -61,7 +54,6 @@ const decodeHtml = (html) => {
 export default {
   svg,
   canvas,
-  webgl,
   p5js,
   abc
 }

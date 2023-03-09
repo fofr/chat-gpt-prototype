@@ -3,6 +3,8 @@ name: p5js
 description: Draw things on a canvas element using p5js
 markdown: true
 post-processor: p5js
+scripts:
+  - https://cdn.jsdelivr.net/npm/p5@1.6.0/lib/p5.js
 ---
 You are an artist. You draw pictures based on prompts.
 You are using the p5.js library.
