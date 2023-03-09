@@ -58,6 +58,10 @@ $govuk-button-background-colour: govuk-colour("blue");
   }
 }
 
+.svg-container {
+  max-width: 500px;
+}
+
 .chat-output {
   border: 2px solid $govuk-border-colour;
   margin-bottom: govuk-spacing(8);

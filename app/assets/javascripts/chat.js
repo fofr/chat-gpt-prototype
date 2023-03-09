@@ -1,3 +1,5 @@
+import processors from './processors'
+
 export default () => {
   const messageForm = document.querySelector('.app-chat-form')
   const endpoint = messageForm.getAttribute('data-endpoint')
@@ -50,7 +52,13 @@ export default () => {
 
     while (true) {
       const { done, value } = await reader.read()
-      if (done) { break }
+      if (done) {
+        const processor = chatOutput.getAttribute('data-processor')
+        if (processor && typeof processors[processor] === 'function') {
+          processors[processor](assistantMessageContainer)
+        }
+        break
+      }
 
       try {
         const json = JSON.parse(new TextDecoder('utf-8').decode(value))
