@@ -29,6 +29,7 @@ export default () => {
     const frontmatterObject = yaml.load(frontmatter)
     prompts[name] = frontmatterObject
     prompts[name].systemMessage = markdown
+    prompts[name].key = name
   })
 
   return prompts

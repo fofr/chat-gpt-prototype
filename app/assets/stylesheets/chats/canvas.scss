@@ -1,0 +1,17 @@
+.app-chat--p5js,
+.app-chat--webgl,
+.app-chat--canvas {
+  position: relative;
+
+  .chat-output {
+    width: 66.666%;
+  }
+
+  .canvas-container {
+    background: #fff;
+    border: 5px solid $govuk-border-colour;
+    position: fixed;
+    right: 30px;
+    bottom: 30px;
+  }
+}

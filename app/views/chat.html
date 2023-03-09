@@ -2,7 +2,7 @@
 {% set title = prompt.name %}
 
 {% block content %}
-  <div class="govuk-grid-row">
+  <div class="govuk-grid-row app-chat--{{ prompt.key }}">
     <div class="govuk-grid-column-full">
       <h2 class="govuk-heading-l govuk-!-margin-bottom-2">
         {{ title }}
@@ -23,7 +23,9 @@
       >
         {% for m in chatAgent.messages %}
           <div class="message message--user">{{ m.messageHtml | safe }}</div>
-          <div class="message message--assistant">{{ m.html | safe }}</div>
+          <div class="message message--assistant">
+            {{ m.html | safe }}
+          </div>
         {% endfor %}
       </div>
 
