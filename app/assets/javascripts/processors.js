@@ -8,7 +8,7 @@ const svg = (container) => {
   }
 }
 
-const canvas = (container, isWebGL = false) => {
+const canvas = (container) => {
   let canvas = document.getElementById('canvas')
   if (!canvas) {
     const canvasContainer = document.createElement('div')
@@ -16,10 +16,6 @@ const canvas = (container, isWebGL = false) => {
     canvasContainer.innerHTML = '<canvas id="canvas" width="400" height="400"></canvas>'
     container.appendChild(canvasContainer)
     canvas = document.getElementById('canvas')
-
-    if (isWebGL) {
-      canvas = canvas.getContext('webgl')
-    }
   }
 
   const code = getCode(container)
@@ -27,10 +23,6 @@ const canvas = (container, isWebGL = false) => {
     // Dangerous
     eval(decodeHtml(code.innerHTML))
   }
-}
-
-const webgl = (container) => {
-  canvas(container, true)
 }
 
 const p5js = (container) => {
