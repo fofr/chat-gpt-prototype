@@ -1,23 +1,33 @@
-# GOV.UK Prototype Rig template
+# Experiments with ChatGPT API
 
-A template prototype, built using the [GOV.UK Prototype Rig](https://govuk-prototype-rig.herokuapp.com).
+Experiments with the OpenAI API.
 
-Use this repository as a template.
+Allows setting of different system prompts using markdown files.
+
+Example prompt:
+
+```md
+---
+name: Keyword generator
+description: Gives a comma separated list of keywords
+markdown: true
+---
+You are a helper for generating keywords.
+Given a description or a list of keywords, you need to generate 50 keywords.
+Keywords must be comma separated and LOWER CASE. 1 word per keyword.
+Put the most important keyword first.
+```
 
 ## Requirements
 
-* Node.js v16
-* [Node version manager (NVM)](https://github.com/nvm-sh/nvm)
+Node.js v18
 
 ## Installation
 
 1. Clone this repository
 
-2. Use [NVM](https://github.com/nvm-sh/nvm) to run the correct Node version:\
-`nvm use`
-
-3. Install the dependencies:\
+2. Install the dependencies:\
 `npm install`
 
-4. Start the application:\
+3. Start the application:\
 `nvm use; npm start`
