@@ -48,14 +48,16 @@ export default () => {
     assistantMessageContainer.classList.add('message', 'message--assistant')
     chatOutput.appendChild(assistantMessageContainer)
 
+    const postProcessor = chatOutput.getAttribute('data-post-processor')
+    const processor = chatOutput.getAttribute('data-processor')
+
     const reader = response.body.getReader()
 
     while (true) {
       const { done, value } = await reader.read()
       if (done) {
-        const processor = chatOutput.getAttribute('data-processor')
-        if (processor && typeof processors[processor] === 'function') {
-          processors[processor](assistantMessageContainer)
+        if (postProcessor && typeof processors[postProcessor] === 'function') {
+          processors[postProcessor](assistantMessageContainer)
         }
         break
       }
@@ -65,6 +67,11 @@ export default () => {
         userMessageContainer.innerHTML = json.messageHtml
         assistantMessageContainer.innerHTML = json.html
         chatOutput.style.display = 'block'
+
+        if (processor && typeof processors[processor] === 'function') {
+          processors[processor](assistantMessageContainer, json)
+        }
+
         window.scrollTo(0, document.body.scrollHeight)
       } catch (e) {
         console.log(e)
