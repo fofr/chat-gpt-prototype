@@ -44,6 +44,18 @@ const p5js = (container) => {
   canvas(container, true)
 }
 
+const abc = (container) => {
+  const code = getCode(container)
+  if (code) {
+    const abcContainer = document.createElement('div')
+    const id = `abc-container-${Math.random().toString(36).slice(2, 8)}`
+    abcContainer.id = id
+    abcContainer.classList.add('abc-container')
+    container.appendChild(abcContainer)
+    window.ABCJS.renderAbc(id, code.innerHTML)
+  }
+}
+
 const getCode = (container) => {
   return container.querySelector('code')
 }
@@ -58,5 +70,6 @@ export default {
   svg,
   canvas,
   webgl,
-  p5js
+  p5js,
+  abc
 }

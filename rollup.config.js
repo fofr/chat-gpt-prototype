@@ -17,6 +17,12 @@ export default [{
       targets: [{
         src: 'app/assets/!(javascripts|stylesheets)',
         dest: 'public'
+      }, {
+        src: 'node_modules/abcjs/dist/*.js',
+        dest: 'public/javascripts'
+      }, {
+        src: 'node_modules/abcjs/abcjs-audio.css',
+        dest: 'public/stylesheets'
       }]
     }),
     // Resolve modules imported from node_modules
