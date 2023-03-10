@@ -24,10 +24,14 @@ Node.js v18
 
 ## Installation
 
-1. Clone this repository
+1. Clone this repository.
 
 2. Install the dependencies:\
 `npm install`
 
-3. Start the application:\
+3. [Generate an OpenAI API key](https://platform.openai.com/account/api-keys).
+
+4. Set the `OPENAI_API_KEY` environment variable to the value of your key.
+
+5. Start the application:\
 `nvm use; npm start`
