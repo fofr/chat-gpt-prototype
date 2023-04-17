@@ -28,7 +28,7 @@
   "dependencies": {
     "@rollup/plugin-commonjs": "^24.0.1",
     "@rollup/plugin-node-resolve": "^15.0.1",
-    "abcjs": "^6.1.9",
+    "abcjs": "^6.2.2",
     "chatgpt": "^5.0.7",
     "dotenv": "^16.0.3",
     "govuk-prototype-rig": "^0.9.2",
